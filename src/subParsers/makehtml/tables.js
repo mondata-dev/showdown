@@ -33,9 +33,9 @@ showdown.subParser('makehtml.tables', function (text, options, globals) {
     return '<th' + id + style + '>' + header + '</th>\n';
   }
 
-  function parseCells (cell, style) {
+  function parseCells (cell, style, header) {
     var subText = showdown.subParser('makehtml.spanGamut')(cell, options, globals);
-    return '<td' + style + '>' + subText + '</td>\n';
+    return '<td' + style + ' data-header="'+ header.trim() +'">' + subText + '</td>\n';
   }
 
   function buildTable (headers, cells) {
@@ -118,7 +118,7 @@ showdown.subParser('makehtml.tables', function (text, options, globals) {
         if (showdown.helper.isUndefined(rawCells[i][ii])) {
 
         }
-        row.push(parseCells(rawCells[i][ii], styles[ii]));
+        row.push(parseCells(rawCells[i][ii], styles[ii], rawHeaders[ii]));
       }
       cells.push(row);
     }
