@@ -1,4 +1,4 @@
-;/*! showdown v 2.0.0-alpha1 - 24-10-2018 */
+;/*! showdown v 2.0.0-alpha1 - 25-01-2020 */
 (function(){
 /**
  * Created by Tivie on 13-07-2015.
@@ -2530,8 +2530,9 @@ showdown.subParser('makehtml.ellipsis', function (text, options, globals) {
 });
 
 /**
- * These are all the transformations that occur *within* block-level
- * tags like paragraphs, headers, and list items.
+ * Turn emoji codes into emojis
+ *
+ * List of supported emojis: https://github.com/showdownjs/showdown/wiki/Emojis
  */
 showdown.subParser('makehtml.emoji', function (text, options, globals) {
   'use strict';
@@ -3363,7 +3364,7 @@ showdown.subParser('makehtml.italicsAndBold', function (text, options, globals) 
     // to external links. Hash links (#) open in same page
     if (options.openLinksInNewWindow && !/^#/.test(url)) {
       // escaped _
-      target = ' target="¨E95Eblank"';
+      target = ' rel="noopener noreferrer" target="¨E95Eblank"';
     }
 
     // Text can be a markdown element, so we run through the appropriate parsers
@@ -4193,9 +4194,9 @@ showdown.subParser('makehtml.tables', function (text, options, globals) {
     return '<th' + id + style + '>' + header + '</th>\n';
   }
 
-  function parseCells (cell, style) {
+  function parseCells (cell, style, header) {
     var subText = showdown.subParser('makehtml.spanGamut')(cell, options, globals);
-    return '<td' + style + '>' + subText + '</td>\n';
+    return '<td' + style + ' data-header="' + header.trim() + '">' + subText + '</td>\n';
   }
 
   function buildTable (headers, cells) {
@@ -4278,7 +4279,7 @@ showdown.subParser('makehtml.tables', function (text, options, globals) {
         if (showdown.helper.isUndefined(rawCells[i][ii])) {
 
         }
-        row.push(parseCells(rawCells[i][ii], styles[ii]));
+        row.push(parseCells(rawCells[i][ii], styles[ii], rawHeaders[ii]));
       }
       cells.push(row);
     }
@@ -4372,6 +4373,12 @@ showdown.subParser('makeMarkdown.blockquote', function (node, globals) {
   txt = txt.trim();
   txt = '> ' + txt.split('\n').join('\n> ');
   return txt;
+});
+
+showdown.subParser('makeMarkdown.break', function () {
+  'use strict';
+
+  return '  \n';
 });
 
 showdown.subParser('makeMarkdown.codeBlock', function (node, globals) {
@@ -4635,6 +4642,10 @@ showdown.subParser('makeMarkdown.node', function (node, globals, spansOnly) {
 
     case 'img':
       txt = showdown.subParser('makeMarkdown.image')(node, globals);
+      break;
+
+    case 'br':
+      txt = showdown.subParser('makeMarkdown.break')(node, globals);
       break;
 
     default:

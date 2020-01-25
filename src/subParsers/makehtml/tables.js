@@ -35,7 +35,7 @@ showdown.subParser('makehtml.tables', function (text, options, globals) {
 
   function parseCells (cell, style, header) {
     var subText = showdown.subParser('makehtml.spanGamut')(cell, options, globals);
-    return '<td' + style + ' data-header="'+ header.trim() +'">' + subText + '</td>\n';
+    return '<td' + style + ' data-header="' + header.trim() + '">' + subText + '</td>\n';
   }
 
   function buildTable (headers, cells) {
